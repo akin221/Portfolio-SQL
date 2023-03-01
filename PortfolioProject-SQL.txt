@@ -1,0 +1,37 @@
+*****PLEASE NOTE THAT THE GOOGLE BIGDATA WAS USED FOR QUERY*****
+
+---Total Case per location per day
+
+SELECT Location, date, total_cases, new_cases, total_deaths, population
+FROM `distributed-eye-247312.PortfolioProject.CovidDeaths`
+Where continent is not null 
+order by 1,2
+
+
+-- Total Cases vs Total Deaths
+-- Shows likelihood of dying if you contract covid in your country
+
+
+Select Location, date, new_cases, new_deaths
+From `distributed-eye-247312.PortfolioProject.CovidDeaths`
+Where location is not null
+and continent is not null 
+order by 1,2
+
+
+-- Total Cases vs Population
+-- Shows what percentage of population infected with Covid
+
+Select Location, date, Population, new_cases,  (new_cases/population)*100 as PercentPopulationInfected
+From `distributed-eye-247312.PortfolioProject.CovidDeaths`
+--Where location like '%states%'
+order by 1,2
+
+
+-- Countries with Highest Infection Rate compared to Population
+
+Select Location, Population, MAX(new_cases) as HighestInfectionCount,  Max((new_cases_cases/population))*100 as PercentPopulationInfected
+From `distributed-eye-247312.PortfolioProject.CovidDeaths`
+--Where location like '%states%'
+Group by Location, Population
+order by PercentPopulationInfected desc
