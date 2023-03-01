@@ -35,3 +35,66 @@ From `distributed-eye-247312.PortfolioProject.CovidDeaths`
 --Where location like '%states%'
 Group by Location, Population
 order by PercentPopulationInfected desc
+
+
+
+-- Countries with Highest Death Count per Population
+
+Select Location, MAX(cast(new_deaths as int)) as TotalDeathCount
+From `distributed-eye-247312.PortfolioProject.CovidDeaths`
+--Where location like '%states%'
+Where continent is not null 
+Group by Location
+order by TotalDeathCount desc
+
+
+
+-- BREAKING THINGS DOWN BY CONTINENT
+-- Showing contintents with the highest death count per population
+
+Select continent, MAX(cast(new_deaths as int)) as TotalDeathCount
+From `distributed-eye-247312.PortfolioProject.CovidDeaths`
+--Where location like '%states%'
+Where continent is not null 
+Group by continent
+order by TotalDeathCount desc
+
+
+-- GLOBAL NUMBERS
+
+Select SUM(new_cases) as total_cases, SUM(cast(new_deaths as int)) as total_deaths, SUM(cast(new_deaths as int))/SUM(New_Cases)*100 as DeathPercentage
+From `distributed-eye-247312.PortfolioProject.CovidDeaths`
+--Where location like '%states%'
+where continent is not null 
+--Group By date
+order by 1,2
+
+
+
+-- Total Population vs Vaccinations
+-- Shows Percentage of Population that has recieved at least one Covid Vaccine
+
+Select death.continent, death.location, death.date, death.population, vaccine.new_vaccinations
+, SUM(vaccine.new_vaccinations) OVER (Partition by death.Location Order by death.location, death.Date) as RollingPeopleVaccinated
+--, (RollingPeopleVaccinated/population)*100
+From `distributed-eye-247312.PortfolioProject.CovidDeaths` death
+Join `distributed-eye-247312.PortfolioProject.CovidData` vaccine
+	On death.location = vaccine.location
+	and death.date = vaccine.date
+where death.continent is not null 
+order by 2,3
+
+
+
+-- Creating View to store data for later visualizations
+
+Create View PercentPopulationVaccinated as
+Select death.continent, death.location, death.date, death.population, vaccine.new_vaccinations
+, SUM(vaccine.new_vaccinations) OVER (Partition by death.Location Order by death.location, death.Date) as RollingPeopleVaccinated
+--, (RollingPeopleVaccinated/population)*100
+From `distributed-eye-247312.PortfolioProject.CovidDeaths` death
+Join `distributed-eye-247312.PortfolioProject.CovidData` vaccine
+	On death.location = vaccine.location
+	and death.date = vaccine.date
+where dea.continent is not null 
+
